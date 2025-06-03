@@ -1,0 +1,1159 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRadio - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .admin-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #ecf0f1;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-input {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #3498db;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .playlist-admin {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .song-item {
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .song-filename {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            margin-top: 5px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .current-playing {
+            background: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid #2ecc71;
+        }
+
+        .upload-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .upload-progress-bar {
+            height: 100%;
+            background: #3498db;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid #2ecc71;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid #e74c3c;
+        }
+
+        .chat-moderation {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chat-messages-admin {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .chat-message-admin {
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-message-admin.system {
+            background: rgba(52, 152, 219, 0.3);
+        }
+
+        .chat-message-admin.request {
+            background: rgba(46, 204, 113, 0.3);
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-meta {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 5px;
+        }
+
+        .ban-user-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ban-user-form input {
+            flex: 1;
+        }
+
+        .request-item {
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .request-meta {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Voltar para WebRadio</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Painel Administrativo</h1>
+            <p>Gerenciar WebRadio</p>
+        </div>
+
+        <div id="messageContainer"></div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalSongs">0</div>
+                <div class="stat-label">Total de Músicas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="currentSongTitle">Nenhuma</div>
+                <div class="stat-label">Tocando Agora</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="simultaneousListeners">0</div>
+                <div class="stat-label">Ouvintes Online</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSessions">0</div>
+                <div class="stat-label">Sessões Hoje</div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Upload de Música</h2>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label for="audioFile">Arquivo de Áudio:</label>
+                    <input type="file" id="audioFile" name="audioFile" accept="audio/*" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="songTitle">Título da Música:</label>
+                    <input type="text" id="songTitle" name="title" placeholder="Digite o título da música" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-success">Upload Música</button>
+                <div class="upload-progress" id="uploadProgress">
+                    <div class="upload-progress-bar" id="uploadProgressBar"></div>
+                </div>
+            </form>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Controle da Playlist</h2>
+            <div class="song-actions" style="margin-bottom: 20px;">
+                <button class="btn btn-small" id="prevBtn">⏮ Anterior</button>
+                <button class="btn btn-small" id="nextBtn">Próxima ⏭</button>
+            </div>
+            <div class="playlist-admin" id="playlistContainer">
+                <p>Carregando playlist...</p>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Moderação do Chat</h2>
+            <div class="chat-moderation">
+                <div class="chat-messages-admin" id="chatMessagesAdmin">
+                    <p>Carregando mensagens...</p>
+                </div>
+                <div class="ban-user-form">
+                    <input type="text" id="banUsernameInput" placeholder="Nome do usuário para banir" class="form-input">
+                    <button class="btn btn-danger" id="banUserBtn">Banir Usuário</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Pedidos de Música</h2>
+            <div class="music-requests" id="musicRequests">
+                <p>Carregando pedidos...</p>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Transmissão ao Vivo</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn btn-success" id="startLiveBtn">🔴 Iniciar Live</button>
+                <button class="btn btn-danger" id="stopLiveBtn">⚫ Parar Live</button>
+                <div id="liveStatus" style="padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.2);">
+                    Status: Offline
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Agendamento de Programas</h2>
+            <form id="programForm" style="margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="programTitle" placeholder="Título do programa" class="form-input" required>
+                    <input type="text" id="programDescription" placeholder="Descrição" class="form-input">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <input type="time" id="programTime" class="form-input" required>
+                    <input type="number" id="programDuration" placeholder="Duração (min)" class="form-input" min="1" required>
+                    <label style="display: flex; align-items: center; color: white;">
+                        <input type="checkbox" id="programRecurring" style="margin-right: 5px;"> Recorrente
+                    </label>
+                </div>
+                <div id="daysOfWeek" style="display: none; margin-bottom: 10px;">
+                    <label style="color: white; margin-bottom: 5px; display: block;">Dias da Semana:</label>
+                    <div style="display: flex; gap: 10px;">
+                        <label style="color: white;"><input type="checkbox" value="0"> Dom</label>
+                        <label style="color: white;"><input type="checkbox" value="1"> Seg</label>
+                        <label style="color: white;"><input type="checkbox" value="2"> Ter</label>
+                        <label style="color: white;"><input type="checkbox" value="3"> Qua</label>
+                        <label style="color: white;"><input type="checkbox" value="4"> Qui</label>
+                        <label style="color: white;"><input type="checkbox" value="5"> Sex</label>
+                        <label style="color: white;"><input type="checkbox" value="6"> Sáb</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Agendar Programa</button>
+            </form>
+            <div id="programsList">
+                <p>Carregando programas...</p>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Jingles e Vinhetas</h2>
+            <form id="jingleForm" style="margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <input type="file" id="jingleFile" accept="audio/*" class="form-input" required>
+                    <input type="text" id="jingleName" placeholder="Nome do jingle" class="form-input">
+                    <select id="jingleType" class="form-input">
+                        <option value="station">Vinheta da Estação</option>
+                        <option value="commercial">Comercial</option>
+                        <option value="transition">Transição</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="number" id="jingleInterval" placeholder="Intervalo (minutos)" class="form-input" min="1" value="30">
+                    <button type="submit" class="btn btn-success">Adicionar Jingle</button>
+                </div>
+            </form>
+            <div id="jinglesList">
+                <p>Carregando jingles...</p>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">📊 Analytics e Estatísticas</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <h3 style="margin-bottom: 15px;">🎵 Músicas Mais Tocadas</h3>
+                    <div id="topSongs" style="max-height: 200px; overflow-y: auto;">
+                        <p>Carregando...</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 15px;">👥 Ouvintes Ativos</h3>
+                    <div id="activeListeners" style="max-height: 200px; overflow-y: auto;">
+                        <p>Carregando...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h3 style="margin-bottom: 15px;">📈 Relatório de Audiência (Últimos 7 dias)</h3>
+                <div id="audienceReport" style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.2);">
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Data</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Ouvintes Únicos</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Tempo Total (min)</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Músicas Tocadas</th>
+                                <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Tempo Médio (min)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audienceReportBody">
+                            <tr><td colspan="5" style="text-align: center; padding: 20px;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Notificações Especiais</h2>
+            <form id="notificationForm" style="margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="notificationTitle" placeholder="Título da notificação" class="form-input" required>
+                    <select id="notificationType" class="form-input">
+                        <option value="info">Informação</option>
+                        <option value="warning">Aviso</option>
+                        <option value="announcement">Anúncio</option>
+                        <option value="program">Programa</option>
+                    </select>
+                </div>
+                <textarea id="notificationMessage" placeholder="Mensagem da notificação" class="form-input" rows="3" required></textarea>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <label style="display: flex; align-items: center; color: white;">
+                        <input type="checkbox" id="notificationImmediate" style="margin-right: 5px;"> Enviar Agora
+                    </label>
+                    <input type="datetime-local" id="notificationScheduled" class="form-input" style="flex: 1;">
+                    <button type="submit" class="btn btn-success">Criar Notificação</button>
+                </div>
+            </form>
+            <div id="notificationsList">
+                <p>Carregando notificações...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let playlist = [];
+        let currentSong = null;
+        let chatMessages = [];
+        let musicRequests = [];
+
+        // DOM elements
+        const uploadForm = document.getElementById('uploadForm');
+        const playlistContainer = document.getElementById('playlistContainer');
+        const totalSongs = document.getElementById('totalSongs');
+        const currentSongTitle = document.getElementById('currentSongTitle');
+        const messageContainer = document.getElementById('messageContainer');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const uploadProgressBar = document.getElementById('uploadProgressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const chatMessagesAdmin = document.getElementById('chatMessagesAdmin');
+        const banUsernameInput = document.getElementById('banUsernameInput');
+        const banUserBtn = document.getElementById('banUserBtn');
+        const musicRequestsContainer = document.getElementById('musicRequests');
+
+        // Socket events
+        socket.on('playlistUpdated', (newPlaylist) => {
+            playlist = newPlaylist;
+            renderPlaylist();
+            updateStats();
+        });
+
+        socket.on('songChanged', (data) => {
+            currentSong = data.currentSong;
+            renderPlaylist();
+            updateStats();
+        });
+
+        socket.on('chatHistory', (messages) => {
+            chatMessages = messages;
+            renderChatMessages();
+        });
+
+        socket.on('newMessage', (message) => {
+            chatMessages.push(message);
+            if (chatMessages.length > 50) {
+                chatMessages = chatMessages.slice(-50);
+            }
+            renderChatMessages();
+        });
+
+        socket.on('requestsUpdated', (requests) => {
+            musicRequests = requests;
+            renderMusicRequests();
+        });
+
+        socket.on('messageDeleted', (messageId) => {
+            chatMessages = chatMessages.filter(msg => msg.id !== messageId);
+            renderChatMessages();
+        });
+
+        // Upload form
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(uploadForm);
+            const audioFile = document.getElementById('audioFile').files[0];
+            
+            if (!audioFile) {
+                showMessage('Por favor, selecione um arquivo de áudio.', 'error');
+                return;
+            }
+
+            // Auto-fill title if empty
+            const titleInput = document.getElementById('songTitle');
+            if (!titleInput.value) {
+                titleInput.value = audioFile.name.replace(/\.[^/.]+$/, "");
+                formData.set('title', titleInput.value);
+            }
+
+            try {
+                uploadProgress.style.display = 'block';
+                
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        uploadProgressBar.style.width = percentComplete + '%';
+                    }
+                });
+
+                xhr.addEventListener('load', () => {
+                    uploadProgress.style.display = 'none';
+                    uploadProgressBar.style.width = '0%';
+                    
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        showMessage('Música enviada com sucesso!', 'success');
+                        uploadForm.reset();
+                    } else {
+                        showMessage('Erro ao enviar música.', 'error');
+                    }
+                });
+
+                xhr.addEventListener('error', () => {
+                    uploadProgress.style.display = 'none';
+                    showMessage('Erro na conexão.', 'error');
+                });
+
+                xhr.open('POST', '/api/upload');
+                xhr.send(formData);
+
+            } catch (error) {
+                uploadProgress.style.display = 'none';
+                showMessage('Erro ao enviar arquivo.', 'error');
+            }
+        });
+
+        // Control buttons
+        prevBtn.addEventListener('click', () => {
+            fetch('/api/previous', { method: 'POST' });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            fetch('/api/next', { method: 'POST' });
+        });
+
+        // Chat moderation
+        banUserBtn.addEventListener('click', () => {
+            const username = banUsernameInput.value.trim();
+            if (username) {
+                fetch('/api/ban-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage(`Usuário ${username} foi banido.`, 'success');
+                        banUsernameInput.value = '';
+                    }
+                });
+            }
+        });
+
+        // Functions
+        function renderPlaylist() {
+            if (playlist.length === 0) {
+                playlistContainer.innerHTML = '<p>Nenhuma música na playlist</p>';
+                return;
+            }
+
+            playlistContainer.innerHTML = playlist.map(song => `
+                <div class="song-item ${currentSong && currentSong.id === song.id ? 'current-playing' : ''}">
+                    <div class="song-info">
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-filename">${song.filename}</div>
+                    </div>
+                    <div class="song-actions">
+                        <button class="btn btn-small btn-success" onclick="playSong(${song.id})">
+                            ${currentSong && currentSong.id === song.id ? '🎵' : '▶'} Tocar
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteSong(${song.id})">🗑 Deletar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            totalSongs.textContent = playlist.length;
+            currentSongTitle.textContent = currentSong ? currentSong.title : 'Nenhuma';
+        }
+
+        function playSong(songId) {
+            fetch(`/api/play/${songId}`, { method: 'POST' });
+        }
+
+        function deleteSong(songId) {
+            if (confirm('Tem certeza que deseja deletar esta música?')) {
+                fetch(`/api/song/${songId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showMessage('Música deletada com sucesso!', 'success');
+                        } else {
+                            showMessage('Erro ao deletar música.', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        showMessage('Erro na conexão.', 'error');
+                    });
+            }
+        }
+
+        function showMessage(text, type) {
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+            message.style.display = 'block';
+            
+            messageContainer.innerHTML = '';
+            messageContainer.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+
+        function renderChatMessages() {
+            if (chatMessages.length === 0) {
+                chatMessagesAdmin.innerHTML = '<p>Nenhuma mensagem no chat</p>';
+                return;
+            }
+
+            chatMessagesAdmin.innerHTML = chatMessages.map(msg => `
+                <div class="chat-message-admin ${msg.type}">
+                    <div class="message-content">
+                        <div class="message-meta">${msg.username} - ${msg.timestamp}</div>
+                        <div>${msg.message}</div>
+                    </div>
+                    ${msg.type === 'user' ? `<button class="btn btn-small btn-danger" onclick="deleteMessage('${msg.id}')">🗑</button>` : ''}
+                </div>
+            `).join('');
+
+            chatMessagesAdmin.scrollTop = chatMessagesAdmin.scrollHeight;
+        }
+
+        function renderMusicRequests() {
+            if (musicRequests.length === 0) {
+                musicRequestsContainer.innerHTML = '<p>Nenhum pedido de música</p>';
+                return;
+            }
+
+            musicRequestsContainer.innerHTML = musicRequests.map(request => `
+                <div class="request-item">
+                    <div class="request-info">
+                        <h4>${request.songName}${request.artist ? ' - ' + request.artist : ''}</h4>
+                        <div class="request-meta">Pedido por ${request.username} às ${request.timestamp}</div>
+                    </div>
+                    <div class="song-actions">
+                        <button class="btn btn-small btn-danger" onclick="deleteRequest('${request.id}')">🗑 Remover</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteMessage(messageId) {
+            if (confirm('Deletar esta mensagem?')) {
+                fetch(`/api/message/${messageId}`, { method: 'DELETE' });
+            }
+        }
+
+        function deleteRequest(requestId) {
+            fetch(`/api/request/${requestId}`, { method: 'DELETE' });
+        }
+
+        // Initialize
+        fetch('/api/playlist')
+            .then(response => response.json())
+            .then(data => {
+                playlist = data;
+                renderPlaylist();
+                updateStats();
+            });
+
+        fetch('/api/current')
+            .then(response => response.json())
+            .then(data => {
+                currentSong = data.currentSong;
+                renderPlaylist();
+                updateStats();
+            });
+
+        fetch('/api/chat')
+            .then(response => response.json())
+            .then(data => {
+                chatMessages = data.messages;
+                renderChatMessages();
+            });
+
+        fetch('/api/requests')
+            .then(response => response.json())
+            .then(data => {
+                musicRequests = data.requests;
+                renderMusicRequests();
+            });
+
+        // Broadcast functionality
+        const startLiveBtn = document.getElementById('startLiveBtn');
+        const stopLiveBtn = document.getElementById('stopLiveBtn');
+        const liveStatus = document.getElementById('liveStatus');
+        const programForm = document.getElementById('programForm');
+        const programRecurring = document.getElementById('programRecurring');
+        const daysOfWeek = document.getElementById('daysOfWeek');
+        const jingleForm = document.getElementById('jingleForm');
+        const notificationForm = document.getElementById('notificationForm');
+        const notificationImmediate = document.getElementById('notificationImmediate');
+        const notificationScheduled = document.getElementById('notificationScheduled');
+
+        let isLive = false;
+
+        // Live streaming controls
+        startLiveBtn.addEventListener('click', () => {
+            fetch('/api/live/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        isLive = true;
+                        updateLiveStatus();
+                        showMessage('Transmissão ao vivo iniciada!', 'success');
+                    } else {
+                        showMessage(data.error, 'error');
+                    }
+                });
+        });
+
+        stopLiveBtn.addEventListener('click', () => {
+            fetch('/api/live/stop', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        isLive = false;
+                        updateLiveStatus();
+                        showMessage('Transmissão ao vivo encerrada', 'success');
+                    } else {
+                        showMessage(data.error, 'error');
+                    }
+                });
+        });
+
+        function updateLiveStatus() {
+            if (isLive) {
+                liveStatus.textContent = 'Status: 🔴 AO VIVO';
+                liveStatus.style.background = 'rgba(231, 76, 60, 0.3)';
+                startLiveBtn.disabled = true;
+                stopLiveBtn.disabled = false;
+            } else {
+                liveStatus.textContent = 'Status: ⚫ Offline';
+                liveStatus.style.background = 'rgba(0,0,0,0.2)';
+                startLiveBtn.disabled = false;
+                stopLiveBtn.disabled = true;
+            }
+        }
+
+        // Program scheduling
+        programRecurring.addEventListener('change', () => {
+            daysOfWeek.style.display = programRecurring.checked ? 'block' : 'none';
+        });
+
+        programForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('programTitle').value,
+                description: document.getElementById('programDescription').value,
+                startTime: document.getElementById('programTime').value,
+                duration: parseInt(document.getElementById('programDuration').value),
+                isRecurring: programRecurring.checked,
+                daysOfWeek: programRecurring.checked ? 
+                    Array.from(document.querySelectorAll('#daysOfWeek input:checked')).map(cb => parseInt(cb.value)) : []
+            };
+
+            fetch('/api/programs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Programa agendado com sucesso!', 'success');
+                    programForm.reset();
+                    daysOfWeek.style.display = 'none';
+                    loadPrograms();
+                } else {
+                    showMessage('Erro ao agendar programa', 'error');
+                }
+            });
+        });
+
+        // Jingle management
+        jingleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('jingle', document.getElementById('jingleFile').files[0]);
+            formData.append('name', document.getElementById('jingleName').value);
+            formData.append('type', document.getElementById('jingleType').value);
+            formData.append('intervalMinutes', document.getElementById('jingleInterval').value);
+
+            try {
+                const response = await fetch('/api/jingles', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Jingle adicionado com sucesso!', 'success');
+                    jingleForm.reset();
+                    loadJingles();
+                } else {
+                    showMessage('Erro ao adicionar jingle', 'error');
+                }
+            } catch (error) {
+                showMessage('Erro na conexão', 'error');
+            }
+        });
+
+        // Notification management
+        notificationImmediate.addEventListener('change', () => {
+            notificationScheduled.disabled = notificationImmediate.checked;
+            if (notificationImmediate.checked) {
+                notificationScheduled.value = '';
+            }
+        });
+
+        notificationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('notificationTitle').value,
+                message: document.getElementById('notificationMessage').value,
+                type: document.getElementById('notificationType').value,
+                isImmediate: notificationImmediate.checked,
+                scheduledTime: notificationImmediate.checked ? null : document.getElementById('notificationScheduled').value
+            };
+
+            fetch('/api/notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Notificação criada!', 'success');
+                    notificationForm.reset();
+                    loadNotifications();
+                } else {
+                    showMessage('Erro ao criar notificação', 'error');
+                }
+            });
+        });
+
+        // Load functions
+        function loadPrograms() {
+            fetch('/api/programs')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('programsList');
+                    
+                    if (data.programs.length === 0) {
+                        container.innerHTML = '<p>Nenhum programa agendado</p>';
+                        return;
+                    }
+
+                    container.innerHTML = data.programs.map(program => `
+                        <div class="request-item">
+                            <div class="request-info">
+                                <h4>${program.title} - ${program.startTime}</h4>
+                                <div class="request-meta">
+                                    ${program.description} | ${program.duration} min
+                                    ${program.isRecurring ? ' | Recorrente' : ''}
+                                </div>
+                            </div>
+                            <div class="song-actions">
+                                <button class="btn btn-small btn-danger" onclick="deleteProgram('${program.id}')">🗑 Remover</button>
+                            </div>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        function loadJingles() {
+            fetch('/api/jingles')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('jinglesList');
+                    
+                    if (data.jingles.length === 0) {
+                        container.innerHTML = '<p>Nenhum jingle cadastrado</p>';
+                        return;
+                    }
+
+                    container.innerHTML = data.jingles.map(jingle => `
+                        <div class="request-item">
+                            <div class="request-info">
+                                <h4>${jingle.name}</h4>
+                                <div class="request-meta">
+                                    ${jingle.type} | A cada ${jingle.intervalMinutes} minutos
+                                </div>
+                            </div>
+                            <div class="song-actions">
+                                <button class="btn btn-small btn-success" onclick="playJingle('${jingle.id}')">▶ Tocar</button>
+                                <button class="btn btn-small btn-danger" onclick="deleteJingle('${jingle.id}')">🗑 Remover</button>
+                            </div>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        function loadNotifications() {
+            fetch('/api/notifications')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('notificationsList');
+                    
+                    if (data.notifications.length === 0) {
+                        container.innerHTML = '<p>Nenhuma notificação</p>';
+                        return;
+                    }
+
+                    container.innerHTML = data.notifications.map(notif => `
+                        <div class="request-item">
+                            <div class="request-info">
+                                <h4>${notif.title}</h4>
+                                <div class="request-meta">
+                                    ${notif.message} | ${notif.type}
+                                    ${notif.sent ? ' | Enviada' : ' | Pendente'}
+                                </div>
+                            </div>
+                            <div class="song-actions">
+                                <button class="btn btn-small btn-danger" onclick="deleteNotification('${notif.id}')">🗑 Remover</button>
+                            </div>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        // Delete functions
+        function deleteProgram(programId) {
+            if (confirm('Remover este programa?')) {
+                fetch(`/api/programs/${programId}`, { method: 'DELETE' })
+                    .then(() => loadPrograms());
+            }
+        }
+
+        function deleteJingle(jingleId) {
+            if (confirm('Remover este jingle?')) {
+                fetch(`/api/jingles/${jingleId}`, { method: 'DELETE' })
+                    .then(() => loadJingles());
+            }
+        }
+
+        function playJingle(jingleId) {
+            fetch(`/api/jingles/${jingleId}/play`, { method: 'POST' });
+        }
+
+        function deleteNotification(notificationId) {
+            fetch(`/api/notifications/${notificationId}`, { method: 'DELETE' })
+                .then(() => loadNotifications());
+        }
+
+        // Analytics functions
+        function loadAnalytics() {
+            fetch('/api/analytics')
+                .then(response => response.json())
+                .then(data => {
+                    updateAnalyticsDisplay(data);
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar analytics:', error);
+                });
+        }
+
+        function updateAnalyticsDisplay(data) {
+            // Atualizar contadores principais
+            document.getElementById('simultaneousListeners').textContent = data.simultaneousListeners;
+            document.getElementById('totalSessions').textContent = data.generalStats.totalSessions;
+
+            // Músicas mais tocadas
+            const topSongsContainer = document.getElementById('topSongs');
+            if (data.topSongs.length === 0) {
+                topSongsContainer.innerHTML = '<p>Nenhuma música foi tocada ainda</p>';
+            } else {
+                topSongsContainer.innerHTML = data.topSongs.map(song => `
+                    <div style="background: rgba(255,255,255,0.1); padding: 10px; margin-bottom: 5px; border-radius: 5px;">
+                        <div style="font-weight: bold;">${song.name}</div>
+                        <div style="font-size: 0.9em; color: rgba(255,255,255,0.7);">
+                            ${song.playCount} plays • ${song.totalListeningTime} min • ${song.currentListeners} ouvindo
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Ouvintes ativos
+            const activeListenersContainer = document.getElementById('activeListeners');
+            if (data.activeListeners.length === 0) {
+                activeListenersContainer.innerHTML = '<p>Nenhum ouvinte ativo</p>';
+            } else {
+                activeListenersContainer.innerHTML = data.activeListeners.map(listener => `
+                    <div style="background: rgba(255,255,255,0.1); padding: 10px; margin-bottom: 5px; border-radius: 5px;">
+                        <div style="font-weight: bold;">${listener.username}</div>
+                        <div style="font-size: 0.9em; color: rgba(255,255,255,0.7);">
+                            ${listener.totalTime} min • ${listener.songsListened} músicas • Desde ${listener.connectedSince}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Relatório de audiência
+            const reportBody = document.getElementById('audienceReportBody');
+            if (data.audienceReports.length === 0) {
+                reportBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Sem dados</td></tr>';
+            } else {
+                reportBody.innerHTML = data.audienceReports.map(report => {
+                    const date = new Date(report.date).toLocaleDateString('pt-BR');
+                    return `
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.2);">${date}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.2); text-align: center;">${report.uniqueListeners}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.2); text-align: center;">${report.totalListeningTime}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.2); text-align: center;">${report.songsPlayed}</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.2); text-align: center;">${report.avgListeningTime}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Load initial data
+        loadPrograms();
+        loadJingles();
+        loadNotifications();
+        loadAnalytics();
+        
+        // Load broadcast status
+        fetch('/api/broadcast/status')
+            .then(response => response.json())
+            .then(data => {
+                isLive = data.isLive;
+                updateLiveStatus();
+            });
+
+        // Atualizar analytics a cada 30 segundos
+        setInterval(loadAnalytics, 30000);
+    </script>
+</body>
+</html>

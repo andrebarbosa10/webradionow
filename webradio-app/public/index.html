@@ -1,0 +1,2239 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRadio - Sua Estação Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .player-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .current-song {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .song-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .song-info {
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .control-btn.active {
+            background: rgba(52, 152, 219, 0.7);
+        }
+
+        .playlist-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .playlist-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .playlist {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .song-item {
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .song-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+
+        .song-item.current {
+            background: rgba(46, 204, 113, 0.3);
+            border-left: 4px solid #2ecc71;
+        }
+
+        .song-name {
+            font-weight: bold;
+        }
+
+        .play-btn {
+            background: #3498db;
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            background: #2980b9;
+        }
+
+        .admin-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .admin-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .chat-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .chat-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .chat-message .username {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .chat-message.system {
+            background: rgba(52, 152, 219, 0.2);
+            border-left: 3px solid #3498db;
+        }
+
+        .chat-message.system .username {
+            color: #2ecc71;
+        }
+
+        .chat-message .timestamp {
+            font-size: 0.8em;
+            opacity: 0.7;
+            float: right;
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            outline: none;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .chat-btn {
+            background: #3498db;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .request-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .request-input {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            outline: none;
+        }
+
+        .request-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .no-songs {
+            text-align: center;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .visualizer {
+            width: 100%;
+            height: 100px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            gap: 2px;
+            padding: 10px;
+        }
+
+        .bar {
+            width: 4px;
+            background: linear-gradient(to top, #3498db, #2ecc71);
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        .broadcast-status {
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(231, 76, 60, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .live-indicator {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .program-info {
+            font-size: 1.1em;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .notification-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(52, 152, 219, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification-popup.show {
+            transform: translateX(0);
+        }
+
+        .notification-popup.program {
+            background: rgba(46, 204, 113, 0.95);
+        }
+
+        .notification-popup.warning {
+            background: rgba(243, 156, 18, 0.95);
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .jingle-player {
+            position: absolute;
+            top: -1000px;
+            left: -1000px;
+        }
+
+        .room-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .room-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .room-card.active {
+            background: rgba(52, 152, 219, 0.3);
+            border: 2px solid #3498db;
+        }
+
+        .room-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .room-description {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .room-users {
+            font-size: 0.8em;
+            color: #3498db;
+        }
+
+        .comment-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .comment-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .comment-username {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .comment-timestamp {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-left: auto;
+        }
+
+        .comment-text {
+            margin-bottom: 8px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .like-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .like-btn.liked {
+            color: #c0392b;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .friend-info {
+            flex: 1;
+        }
+
+        .friend-name {
+            font-weight: bold;
+        }
+
+        .friend-status {
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .friend-status.online {
+            color: #2ecc71;
+        }
+
+        .friend-status.offline {
+            color: #95a5a6;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: rgba(52, 152, 219, 0.3);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .notification-badge {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+
+        .badge-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .badge-card.earned {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.2);
+        }
+
+        .badge-card.not-earned {
+            opacity: 0.6;
+        }
+
+        .badge-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .badge-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .badge-description {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 10px;
+        }
+
+        .badge-points {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .badge-progress {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 6px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .badge-progress-fill {
+            background: #3498db;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .leaderboard-item.current-user {
+            border-left: 4px solid #3498db;
+            background: rgba(52, 152, 219, 0.2);
+        }
+
+        .leaderboard-position {
+            font-size: 1.2em;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .leaderboard-position.top3 {
+            color: #f39c12;
+        }
+
+        .leaderboard-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .leaderboard-info {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .leaderboard-points {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .event-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .event-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #e74c3c;
+        }
+
+        .event-description {
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .event-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .event-participants {
+            color: #3498db;
+        }
+
+        .event-join-btn {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .event-join-btn:hover {
+            background: #c0392b;
+        }
+
+        .event-join-btn:disabled {
+            background: rgba(255,255,255,0.3);
+            cursor: not-allowed;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .activity-icon {
+            font-size: 1.2em;
+        }
+
+        .activity-text {
+            flex: 1;
+            font-size: 0.9em;
+        }
+
+        .activity-points {
+            color: #f39c12;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .points-popup {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            background: rgba(46, 204, 113, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transform: translateY(-50%) translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .points-popup.show {
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .badge-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            background: rgba(46, 204, 113, 0.95);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+            z-index: 1001;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.3s ease;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .badge-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .badge-popup-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .badge-popup-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .badge-popup-description {
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.9);
+        }
+    </style>
+</head>
+<body>
+    <a href="/admin.html" class="admin-link">⚙️ Admin</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎵 WebRadio</h1>
+            <p>Sua Estação Online</p>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 0.9em;">
+                <div id="listenersCount" style="background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 15px;">
+                    👥 <span id="simultaneousListeners">0</span> ouvintes online
+                </div>
+                <div id="currentPlayCount" style="background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 15px;">
+                    🎵 <span id="songPlayCount">0</span> plays
+                </div>
+            </div>
+            <div id="nextProgramInfo" style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;"></div>
+        </div>
+
+        <audio id="jinglePlayer" class="jingle-player" preload="auto"></audio>
+        <div id="notificationContainer"></div>
+
+        <div class="player-container">
+            <div class="broadcast-status" id="broadcastStatus" style="display: none;">
+                <div class="live-indicator">🔴 AO VIVO</div>
+                <div class="program-info" id="programInfo"></div>
+            </div>
+            
+            <div class="current-song">
+                <div class="song-title" id="currentSongTitle">Selecione uma música</div>
+                <div class="song-info" id="currentSongInfo">Playlist vazia</div>
+            </div>
+
+            <audio id="audioPlayer" class="audio-player" controls style="width: 100%;">
+                Seu navegador não suporta o elemento de áudio.
+            </audio>
+
+            <div class="controls">
+                <button class="control-btn" id="shuffleBtn" title="Embaralhar">🔀</button>
+                <button class="control-btn" id="prevBtn" title="Anterior">⏮</button>
+                <button class="control-btn" id="playPauseBtn" title="Play/Pause">⏸</button>
+                <button class="control-btn" id="nextBtn" title="Próxima">⏭</button>
+                <button class="control-btn" id="repeatBtn" title="Repetir">🔁</button>
+            </div>
+
+            <div class="visualizer" id="visualizer">
+                <!-- Barras do visualizador serão inseridas aqui -->
+            </div>
+        </div>
+
+        <div class="playlist-container">
+            <div class="playlist-header">📻 Playlist</div>
+            <div class="playlist" id="playlist">
+                <div class="no-songs">Carregando playlist...</div>
+            </div>
+        </div>
+
+        <div class="user-container" id="userContainer" style="display: none;">
+            <div class="chat-header">👤 Perfil de Usuário</div>
+            <div id="userProfile" style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                    <img id="userAvatar" src="" alt="Avatar" style="width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.3);">
+                    <div>
+                        <h3 id="userDisplayName">Nome do Usuário</h3>
+                        <p id="userBio" style="color: rgba(255,255,255,0.8); margin: 5px 0;">Bio do usuário</p>
+                        <small id="userGenre" style="color: rgba(255,255,255,0.6);">Gênero favorito</small>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="chat-btn" id="editProfileBtn">✏️ Editar</button>
+                    <button class="chat-btn" id="viewFriendsBtn">👥 Amigos</button>
+                    <button class="chat-btn" id="shareProfileBtn">📤 Compartilhar</button>
+                    <button class="chat-btn" onclick="switchMainTab('gamification')">🏆 Gamificação</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-container" id="loginContainer">
+            <div class="chat-header">🎵 Entre para Participar</div>
+            <form class="chat-form" id="loginForm" style="flex-direction: column; gap: 15px;">
+                <input type="text" id="loginUsername" placeholder="Nome de usuário" class="chat-input" required>
+                <input type="email" id="loginEmail" placeholder="Email (opcional)" class="chat-input">
+                <select id="loginGenre" class="chat-input">
+                    <option value="geral">Geral</option>
+                    <option value="pop">Pop</option>
+                    <option value="rock">Rock</option>
+                    <option value="eletronica">Eletrônica</option>
+                    <option value="mpb">MPB</option>
+                    <option value="internacional">Internacional</option>
+                </select>
+                <textarea id="loginBio" placeholder="Conte um pouco sobre você..." class="chat-input" rows="2"></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="chat-btn">🚀 Entrar</button>
+                    <button type="button" class="chat-btn" id="guestModeBtn">👤 Modo Visitante</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="rooms-container" id="roomsContainer" style="display: none;">
+            <div class="chat-header">🏠 Salas de Chat Temáticas</div>
+            <div id="roomsList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                <!-- Salas serão inseridas aqui -->
+            </div>
+            <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px; margin-bottom: 10px;">
+                <strong id="currentRoomName">Sala Geral</strong> - <span id="currentRoomUsers">0 usuários</span>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">💬 Chat ao Vivo</div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message">
+                    <span class="username">Sistema</span>
+                    <span class="timestamp">--:--</span>
+                    <div>Bem-vindo ao chat da WebRadio!</div>
+                </div>
+            </div>
+            <form class="chat-form" id="chatForm">
+                <input type="text" id="usernameInput" placeholder="Seu nome (2-20 chars)" class="chat-input" style="max-width: 150px;" maxlength="20" required>
+                <div style="flex: 1; position: relative;">
+                    <input type="text" id="messageInput" placeholder="Digite sua mensagem (máx 200 chars)..." class="chat-input" maxlength="200" required>
+                    <small id="charCounter" style="position: absolute; right: 10px; top: -20px; color: rgba(255,255,255,0.7);">0/200</small>
+                </div>
+                <button type="submit" class="chat-btn">Enviar</button>
+            </form>
+
+            <div class="request-form">
+                <input type="text" id="requestSongInput" placeholder="Nome da música que você quer ouvir" class="request-input">
+                <input type="text" id="requestArtistInput" placeholder="Artista (opcional)" class="request-input">
+                <button type="button" class="chat-btn" id="requestBtn">🎵 Fazer Pedido</button>
+            </div>
+        </div>
+
+        <div class="friends-container" id="friendsContainer" style="display: none;">
+            <div class="chat-header">👥 Sistema de Amigos</div>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="friendUsernameInput" placeholder="Nome do usuário" class="chat-input" style="flex: 1;">
+                <button class="chat-btn" id="addFriendBtn">➕ Adicionar</button>
+            </div>
+            <div id="friendsList" style="max-height: 200px; overflow-y: auto;">
+                <!-- Lista de amigos será inserida aqui -->
+            </div>
+            <div id="friendRequests" style="margin-top: 15px;">
+                <h4>Solicitações Pendentes</h4>
+                <!-- Solicitações serão inseridas aqui -->
+            </div>
+        </div>
+
+        <div class="comments-container" id="commentsContainer" style="display: none;">
+            <div class="chat-header">💭 Comentários da Música Atual</div>
+            <div id="songComments" style="max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                <p style="text-align: center; color: rgba(255,255,255,0.6);">Nenhum comentário ainda</p>
+            </div>
+            <form class="chat-form" id="commentForm">
+                <div style="flex: 1; position: relative;">
+                    <textarea id="commentInput" placeholder="Comente sobre esta música (máx 300 chars)..." class="chat-input" maxlength="300" rows="2" required></textarea>
+                    <small id="commentCharCounter" style="position: absolute; right: 10px; bottom: 5px; color: rgba(255,255,255,0.7);">0/300</small>
+                </div>
+                <button type="submit" class="chat-btn">💬 Comentar</button>
+            </form>
+        </div>
+
+        <div class="social-container" id="socialContainer" style="display: none;">
+            <div class="chat-header">📱 Compartilhamento Social</div>
+            <div style="text-align: center; padding: 20px;">
+                <h3 id="shareCurrentSong">Compartilhe a música atual</h3>
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
+                    <button class="chat-btn" onclick="shareToSocial('Twitter')">🐦 Twitter</button>
+                    <button class="chat-btn" onclick="shareToSocial('Facebook')">📘 Facebook</button>
+                    <button class="chat-btn" onclick="shareToSocial('WhatsApp')">💚 WhatsApp</button>
+                    <button class="chat-btn" onclick="shareToSocial('Telegram')">📱 Telegram</button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <input type="text" id="shareUrl" readonly class="chat-input" placeholder="URL será gerada aqui">
+                    <button class="chat-btn" onclick="copyShareUrl()" style="margin-top: 10px;">📋 Copiar Link</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="gamification-container" id="gamificationContainer" style="display: none;">
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchGamificationTab('points')">🏆 Pontos</button>
+                <button class="tab-btn" onclick="switchGamificationTab('badges')">🏅 Badges</button>
+                <button class="tab-btn" onclick="switchGamificationTab('leaderboard')">📊 Ranking</button>
+                <button class="tab-btn" onclick="switchGamificationTab('events')">🎉 Eventos</button>
+            </div>
+
+            <div id="pointsTab" class="tab-content active">
+                <div class="chat-header">🏆 Sistema de Pontos</div>
+                <div id="userPointsDisplay" style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 20px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <h3 style="margin: 0; color: #f39c12;">Total: <span id="totalPoints">0</span> pontos</h3>
+                            <p style="margin: 5px 0; color: rgba(255,255,255,0.8);">Hoje: <span id="dailyPoints">0</span> | Esta semana: <span id="weeklyPoints">0</span></p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #3498db; font-size: 1.2em;" id="userRankDisplay">#-- posição</div>
+                            <small style="color: rgba(255,255,255,0.6);">Ranking geral</small>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <strong>Login consecutivo: <span id="consecutiveDays">0</span> dias</strong>
+                    </div>
+                </div>
+
+                <div>
+                    <h4>Atividades Recentes</h4>
+                    <div id="recentActivities" style="max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px;">
+                        <p style="text-align: center; color: rgba(255,255,255,0.6);">Nenhuma atividade recente</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="badgesTab" class="tab-content">
+                <div class="chat-header">🏅 Suas Conquistas</div>
+                <div id="badgesProgress" style="margin-bottom: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px;">
+                    <p><span id="earnedBadgesCount">0</span> de <span id="totalBadgesCount">0</span> badges conquistados</p>
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 10px; margin-top: 10px;">
+                        <div id="badgesProgressBar" style="background: #2ecc71; border-radius: 10px; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+                <div id="badgesList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
+                    <!-- Badges serão inseridos aqui -->
+                </div>
+            </div>
+
+            <div id="leaderboardTab" class="tab-content">
+                <div class="chat-header">📊 Ranking de Ouvintes</div>
+                <div class="tab-navigation" style="margin-bottom: 15px;">
+                    <button class="tab-btn active" onclick="switchLeaderboard('daily')">📅 Hoje</button>
+                    <button class="tab-btn" onclick="switchLeaderboard('weekly')">📊 Semana</button>
+                    <button class="tab-btn" onclick="switchLeaderboard('alltime')">🏆 Geral</button>
+                </div>
+                <div id="leaderboardList" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Leaderboard será inserido aqui -->
+                </div>
+            </div>
+
+            <div id="eventsTab" class="tab-content">
+                <div class="chat-header">🎉 Eventos Especiais</div>
+                <div id="activeEventsList" style="margin-bottom: 15px;">
+                    <!-- Eventos ativos serão inseridos aqui -->
+                </div>
+                <div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.6);" id="noEventsMessage">
+                    Nenhum evento ativo no momento
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        
+        // Estado da aplicação
+        let playlist = [];
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        let isShuffleEnabled = false;
+        let isRepeatEnabled = false;
+        let playMode = 'normal';
+        let audioContext = null;
+        let analyser = null;
+        let dataArray = null;
+
+        // Estado do usuário
+        let currentUser = null;
+        let isLoggedIn = false;
+        let chatRooms = [];
+        let currentRoom = 'geral';
+        let friends = [];
+        let songComments = [];
+        let currentTab = 'chat';
+
+        // Estado da gamificação
+        let userPoints = { totalPoints: 0, dailyPoints: 0, weeklyPoints: 0, consecutiveDays: 0 };
+        let userBadges = [];
+        let leaderboard = { daily: [], weekly: [], alltime: [] };
+        let currentLeaderboardPeriod = 'daily';
+        let activeEvents = [];
+        let currentGamificationTab = 'points';
+
+        // Elementos DOM
+        const audioPlayer = document.getElementById('audioPlayer');
+        const currentSongTitle = document.getElementById('currentSongTitle');
+        const currentSongInfo = document.getElementById('currentSongInfo');
+        const playlistContainer = document.getElementById('playlist');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const usernameInput = document.getElementById('usernameInput');
+        const messageInput = document.getElementById('messageInput');
+        const requestBtn = document.getElementById('requestBtn');
+        const requestSongInput = document.getElementById('requestSongInput');
+        const requestArtistInput = document.getElementById('requestArtistInput');
+        const visualizer = document.getElementById('visualizer');
+
+        // Inicializar visualizador
+        function initVisualizer() {
+            for (let i = 0; i < 50; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = '5px';
+                visualizer.appendChild(bar);
+            }
+        }
+
+        function setupAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaElementSource(audioPlayer);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                analyser.fftSize = 128;
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            }
+        }
+
+        function animate() {
+            if (analyser && isPlaying) {
+                analyser.getByteFrequencyData(dataArray);
+                const bars = visualizer.querySelectorAll('.bar');
+                
+                for (let i = 0; i < bars.length; i++) {
+                    const value = dataArray[i] || 0;
+                    const height = (value / 255) * 80 + 5;
+                    bars[i].style.height = height + 'px';
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Socket events
+        socket.on('playlistUpdated', (newPlaylist) => {
+            playlist = newPlaylist;
+            renderPlaylist();
+        });
+
+        socket.on('playStatusChanged', (data) => {
+            isPlaying = data.isPlaying;
+            currentSongIndex = data.currentIndex;
+            updatePlayerUI();
+        });
+
+        socket.on('songChanged', (data) => {
+            currentSongIndex = data.currentIndex;
+            isPlaying = data.isPlaying;
+            updatePlayerUI();
+            loadCurrentSong();
+        });
+
+        socket.on('playModeChanged', (data) => {
+            isShuffleEnabled = data.shuffle;
+            isRepeatEnabled = data.repeat;
+            playMode = data.playMode;
+            updateModeButtons();
+        });
+
+        socket.on('newMessage', (message) => {
+            addChatMessage(message);
+        });
+
+        socket.on('messageBanned', (message) => {
+            alert(message);
+        });
+
+        socket.on('requestBanned', (message) => {
+            alert(message);
+        });
+
+        socket.on('liveStreamingChanged', (data) => {
+            updateBroadcastStatus(data.isLive);
+        });
+
+        socket.on('broadcastStatus', (data) => {
+            updateBroadcastStatus(data.isLive, data.currentProgram);
+            updateNextProgramInfo(data.nextProgram);
+        });
+
+        socket.on('programStarted', (program) => {
+            updateBroadcastStatus(true, program);
+            showNotification('Programa ao Vivo', `${program.title} começou agora!`, 'program');
+        });
+
+        socket.on('programEnded', (program) => {
+            updateBroadcastStatus(false);
+        });
+
+        socket.on('playJingle', (jingle) => {
+            playJingle(jingle);
+        });
+
+        socket.on('specialNotification', (notification) => {
+            showNotification(notification.title, notification.message, notification.type);
+        });
+
+        socket.on('userAuthenticated', (data) => {
+            currentUser = data.user;
+            isLoggedIn = true;
+            updateUserInterface();
+            showNotification('Bem-vindo!', `Olá, ${currentUser.username}!`, 'info');
+        });
+
+        socket.on('roomsList', (rooms) => {
+            chatRooms = rooms;
+            renderRoomsList();
+        });
+
+        socket.on('roomMessage', (message) => {
+            if (message.roomId === currentRoom) {
+                addChatMessage(message);
+            }
+        });
+
+        socket.on('roomMessages', (messages) => {
+            // Limpar mensagens atuais e adicionar mensagens da sala
+            chatMessages.innerHTML = '';
+            messages.forEach(message => addChatMessage(message));
+        });
+
+        socket.on('friendRequestReceived', (data) => {
+            if (data.toUserId === currentUser?.id) {
+                showNotification('Nova solicitação!', `${data.fromUser.username} quer ser seu amigo`, 'info');
+                // Atualizar lista de solicitações se estiver visível
+            }
+        });
+
+        socket.on('friendRequestSent', (message) => {
+            showNotification('Sucesso!', message, 'info');
+        });
+
+        socket.on('newSongComment', (data) => {
+            if (parseInt(data.songId) === (playlist[currentSongIndex]?.id)) {
+                addSongComment(data.comment);
+            }
+        });
+
+        socket.on('commentLiked', (data) => {
+            updateCommentLikes(data.commentId, data.likes);
+        });
+
+        socket.on('pointsEarned', (data) => {
+            if (data.userId === currentUser?.id) {
+                userPoints.totalPoints = data.totalPoints;
+                updatePointsDisplay();
+                showPointsPopup(data.points, data.message);
+            }
+        });
+
+        socket.on('badgeEarned', (data) => {
+            if (data.userId === currentUser?.id) {
+                userBadges.push(data.badge);
+                updateBadgesDisplay();
+                showBadgePopup(data.badge);
+            }
+        });
+
+        socket.on('gamificationData', (data) => {
+            userPoints = data.points;
+            userBadges = data.badges;
+            updatePointsDisplay();
+            updateBadgesDisplay();
+            updateUserRankDisplay(data.rank);
+        });
+
+        socket.on('specialEventStarted', (event) => {
+            activeEvents.push(event);
+            updateEventsDisplay();
+            showNotification('Novo Evento!', `${event.name} começou!`, 'info');
+        });
+
+        // Event listeners
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                fetch('/api/pause', { method: 'POST' });
+                audioPlayer.pause();
+            } else {
+                fetch('/api/play', { method: 'POST' });
+                audioPlayer.play();
+                setupAudioContext();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            fetch('/api/next', { method: 'POST' });
+        });
+
+        prevBtn.addEventListener('click', () => {
+            fetch('/api/previous', { method: 'POST' });
+        });
+
+        shuffleBtn.addEventListener('click', () => {
+            fetch('/api/shuffle', { method: 'POST' });
+        });
+
+        repeatBtn.addEventListener('click', () => {
+            fetch('/api/repeat', { method: 'POST' });
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            fetch('/api/next', { method: 'POST' });
+        });
+
+        audioPlayer.addEventListener('play', () => {
+            setupAudioContext();
+            audioContext.resume();
+        });
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            const message = messageInput.value.trim();
+            
+            // Validação no frontend
+            if (!username || username.length < 2 || username.length > 20) {
+                alert('Nome de usuário deve ter entre 2 e 20 caracteres');
+                return;
+            }
+            
+            if (!message || message.length === 0) {
+                alert('Digite uma mensagem');
+                return;
+            }
+            
+            if (message.length > 200) {
+                alert('Mensagem muito longa (máximo 200 caracteres)');
+                return;
+            }
+            
+            if (username && message) {
+                socket.emit('sendMessage', { username, message });
+                messageInput.value = '';
+            }
+        });
+
+        requestBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            const songName = requestSongInput.value.trim();
+            const artist = requestArtistInput.value.trim();
+            
+            if (username && songName) {
+                socket.emit('requestMusic', { username, songName, artist });
+                requestSongInput.value = '';
+                requestArtistInput.value = '';
+                alert('Pedido enviado!');
+            } else {
+                alert('Preencha seu nome e o nome da música');
+            }
+        });
+
+        // Funções
+        function renderPlaylist() {
+            if (playlist.length === 0) {
+                playlistContainer.innerHTML = '<div class="no-songs">Nenhuma música na playlist</div>';
+                return;
+            }
+
+            playlistContainer.innerHTML = playlist.map((song, index) => `
+                <div class="song-item ${index === currentSongIndex ? 'current' : ''}" onclick="playSong(${song.id})">
+                    <div class="song-name">${song.name}</div>
+                    <button class="play-btn" onclick="event.stopPropagation(); playSong(${song.id})">
+                        ${index === currentSongIndex && isPlaying ? '⏸' : '▶'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function playSong(songId) {
+            fetch('/api/play', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ songId })
+            });
+        }
+
+        function loadCurrentSong() {
+            if (playlist[currentSongIndex]) {
+                const song = playlist[currentSongIndex];
+                audioPlayer.src = song.path;
+                currentSongTitle.textContent = song.name;
+                currentSongInfo.textContent = `Faixa ${currentSongIndex + 1} de ${playlist.length}`;
+                
+                if (isPlaying) {
+                    audioPlayer.play();
+                }
+            }
+        }
+
+        function updatePlayerUI() {
+            playPauseBtn.textContent = isPlaying ? '⏸' : '▶';
+            renderPlaylist();
+        }
+
+        function updateModeButtons() {
+            shuffleBtn.classList.toggle('active', isShuffleEnabled);
+            repeatBtn.classList.toggle('active', isRepeatEnabled);
+            
+            if (playMode === 'repeat-one') {
+                repeatBtn.textContent = '🔂';
+            } else {
+                repeatBtn.textContent = '🔁';
+            }
+        }
+
+        function addChatMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${message.type || 'user'}`;
+            messageDiv.innerHTML = `
+                <span class="username">${message.username}</span>
+                <span class="timestamp">${message.timestamp}</span>
+                <div>${message.message}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Manter apenas as últimas 50 mensagens
+            while (chatMessages.children.length > 50) {
+                chatMessages.removeChild(chatMessages.firstChild);
+            }
+        }
+
+        // Inicialização
+        fetch('/api/playlist')
+            .then(response => response.json())
+            .then(data => {
+                playlist = data;
+                renderPlaylist();
+            });
+
+        fetch('/api/current')
+            .then(response => response.json())
+            .then(data => {
+                if (data.currentSong) {
+                    currentSongIndex = data.currentIndex;
+                    isPlaying = data.isPlaying;
+                    isShuffleEnabled = data.shuffle;
+                    isRepeatEnabled = data.repeat;
+                    playMode = data.playMode;
+                    
+                    loadCurrentSong();
+                    updatePlayerUI();
+                    updateModeButtons();
+                }
+            });
+
+        // Contador de caracteres
+        messageInput.addEventListener('input', () => {
+            const charCount = messageInput.value.length;
+            const charCounter = document.getElementById('charCounter');
+            charCounter.textContent = `${charCount}/200`;
+            
+            if (charCount > 180) {
+                charCounter.style.color = '#e74c3c';
+            } else if (charCount > 150) {
+                charCounter.style.color = '#f39c12';
+            } else {
+                charCounter.style.color = 'rgba(255,255,255,0.7)';
+            }
+        });
+
+        // Funções de broadcast
+        function updateBroadcastStatus(isLive, program = null) {
+            const broadcastStatus = document.getElementById('broadcastStatus');
+            const programInfo = document.getElementById('programInfo');
+            
+            if (isLive) {
+                broadcastStatus.style.display = 'block';
+                if (program) {
+                    programInfo.textContent = `${program.title} - ${program.description || 'Transmissão ao vivo'}`;
+                } else {
+                    programInfo.textContent = 'Transmissão ao vivo em andamento';
+                }
+            } else {
+                broadcastStatus.style.display = 'none';
+            }
+        }
+
+        function updateNextProgramInfo(nextProgram) {
+            const nextProgramInfo = document.getElementById('nextProgramInfo');
+            
+            if (nextProgram) {
+                const hours = Math.floor(nextProgram.nextStart / 60);
+                const minutes = nextProgram.nextStart % 60;
+                
+                let timeText = '';
+                if (hours > 0) {
+                    timeText = `${hours}h ${minutes}min`;
+                } else {
+                    timeText = `${minutes} minutos`;
+                }
+                
+                nextProgramInfo.textContent = `📻 Próximo: ${nextProgram.title} em ${timeText}`;
+            } else {
+                nextProgramInfo.textContent = '';
+            }
+        }
+
+        function playJingle(jingle) {
+            const jinglePlayer = document.getElementById('jinglePlayer');
+            jinglePlayer.src = jingle.path;
+            jinglePlayer.volume = 0.7;
+            
+            // Diminuir volume da música principal
+            if (audioPlayer.volume > 0) {
+                const originalVolume = audioPlayer.volume;
+                audioPlayer.volume = 0.3;
+                
+                jinglePlayer.play().then(() => {
+                    jinglePlayer.addEventListener('ended', () => {
+                        audioPlayer.volume = originalVolume;
+                    }, { once: true });
+                }).catch(error => {
+                    audioPlayer.volume = originalVolume;
+                    console.log('Erro ao tocar jingle:', error);
+                });
+            } else {
+                jinglePlayer.play().catch(error => {
+                    console.log('Erro ao tocar jingle:', error);
+                });
+            }
+        }
+
+        function showNotification(title, message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification-popup ${type}`;
+            notification.innerHTML = `
+                <div class="notification-title">${title}</div>
+                <div>${message}</div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Mostrar notificação
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Remover notificação após 5 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Função para atualizar contadores
+        function updateListenerCount() {
+            fetch('/api/analytics/listeners')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('simultaneousListeners').textContent = data.simultaneousListeners;
+                })
+                .catch(error => {
+                    console.error('Erro ao atualizar contadores:', error);
+                });
+        }
+
+        function updateSongStats() {
+            if (playlist[currentSongIndex]) {
+                fetch('/api/analytics/songs')
+                    .then(response => response.json())
+                    .then(data => {
+                        const currentSong = playlist[currentSongIndex];
+                        const songStats = data.topSongs.find(s => s.id === currentSong.id);
+                        const playCount = songStats ? songStats.playCount : 0;
+                        document.getElementById('songPlayCount').textContent = playCount;
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar stats da música:', error);
+                    });
+            }
+        }
+
+        // Carregar status inicial do broadcast
+        fetch('/api/broadcast/status')
+            .then(response => response.json())
+            .then(data => {
+                updateBroadcastStatus(data.isLive, data.currentProgram);
+                updateNextProgramInfo(data.nextProgram);
+            });
+
+        // Inicializar contadores
+        updateListenerCount();
+        updateSongStats();
+
+        // Atualizar contadores a cada 15 segundos
+        setInterval(updateListenerCount, 15000);
+        setInterval(updateSongStats, 30000);
+
+        // User Management Functions
+        const loginForm = document.getElementById('loginForm');
+        const guestModeBtn = document.getElementById('guestModeBtn');
+        const addFriendBtn = document.getElementById('addFriendBtn');
+        const commentForm = document.getElementById('commentForm');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const email = document.getElementById('loginEmail').value.trim();
+            const genre = document.getElementById('loginGenre').value;
+            const bio = document.getElementById('loginBio').value.trim();
+
+            if (!username || username.length < 2) {
+                alert('Nome de usuário deve ter pelo menos 2 caracteres');
+                return;
+            }
+
+            // Registrar usuário
+            fetch('/api/users/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username,
+                    email,
+                    bio,
+                    favoriteGenre: genre
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    socket.emit('userLogin', { userId: data.user.id });
+                } else {
+                    // Tentar login se usuário já existe
+                    fetch('/api/users/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username })
+                    })
+                    .then(response => response.json())
+                    .then(loginData => {
+                        if (loginData.success) {
+                            socket.emit('userLogin', { userId: loginData.user.id });
+                        } else {
+                            alert('Erro ao fazer login: ' + (data.error || loginData.error));
+                        }
+                    });
+                }
+            });
+        });
+
+        guestModeBtn.addEventListener('click', () => {
+            // Modo visitante - esconder login e mostrar chat básico
+            document.getElementById('loginContainer').style.display = 'none';
+            usernameInput.style.display = 'block';
+        });
+
+        addFriendBtn.addEventListener('click', () => {
+            const username = document.getElementById('friendUsernameInput').value.trim();
+            if (username && currentUser) {
+                socket.emit('sendFriendRequest', {
+                    fromUserId: currentUser.id,
+                    toUsername: username
+                });
+                document.getElementById('friendUsernameInput').value = '';
+            }
+        });
+
+        commentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const comment = document.getElementById('commentInput').value.trim();
+            
+            if (!comment || !currentUser) {
+                alert('Faça login para comentar');
+                return;
+            }
+
+            if (playlist[currentSongIndex]) {
+                socket.emit('addSongComment', {
+                    songId: playlist[currentSongIndex].id,
+                    userId: currentUser.id,
+                    comment
+                });
+                document.getElementById('commentInput').value = '';
+            }
+        });
+
+        // Room Functions
+        function renderRoomsList() {
+            const roomsList = document.getElementById('roomsList');
+            if (!roomsList) return;
+
+            roomsList.innerHTML = chatRooms.map(room => `
+                <div class="room-card ${room.id === currentRoom ? 'active' : ''}" onclick="joinRoom('${room.id}')">
+                    <div class="room-title">${room.name}</div>
+                    <div class="room-description">${room.description}</div>
+                    <div class="room-users">${room.userCount || 0} usuários</div>
+                </div>
+            `).join('');
+        }
+
+        function joinRoom(roomId) {
+            if (currentUser) {
+                currentRoom = roomId;
+                socket.emit('joinRoom', { roomId, userId: currentUser.id });
+                
+                const room = chatRooms.find(r => r.id === roomId);
+                if (room) {
+                    document.getElementById('currentRoomName').textContent = room.name;
+                }
+                
+                renderRoomsList();
+            }
+        }
+
+        function updateUserInterface() {
+            if (isLoggedIn && currentUser) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('userContainer').style.display = 'block';
+                document.getElementById('roomsContainer').style.display = 'block';
+                document.getElementById('friendsContainer').style.display = 'block';
+                document.getElementById('commentsContainer').style.display = 'block';
+                document.getElementById('socialContainer').style.display = 'block';
+
+                // Atualizar dados do usuário
+                document.getElementById('userDisplayName').textContent = currentUser.username;
+                document.getElementById('userBio').textContent = currentUser.bio || 'Amante da música';
+                document.getElementById('userGenre').textContent = `Gênero favorito: ${currentUser.favoriteGenre}`;
+                
+                if (currentUser.avatar) {
+                    document.getElementById('userAvatar').src = currentUser.avatar;
+                }
+
+                // Esconder input de username do chat básico
+                usernameInput.style.display = 'none';
+                usernameInput.value = currentUser.username;
+
+                // Carregar comentários da música atual
+                loadCurrentSongComments();
+            }
+        }
+
+        function addSongComment(comment) {
+            const commentsContainer = document.getElementById('songComments');
+            
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'comment-item';
+            commentDiv.innerHTML = `
+                <div class="comment-header">
+                    <img src="${comment.avatar || '/default-avatar.png'}" alt="Avatar" class="comment-avatar">
+                    <span class="comment-username">${comment.username}</span>
+                    <span class="comment-timestamp">${new Date(comment.timestamp).toLocaleTimeString()}</span>
+                </div>
+                <div class="comment-text">${comment.comment}</div>
+                <div class="comment-actions">
+                    <button class="like-btn" onclick="likeSongComment('${comment.id}')" title="Curtir">
+                        ❤️ <span id="likes-${comment.id}">${comment.likes}</span>
+                    </button>
+                </div>
+            `;
+            
+            commentsContainer.appendChild(commentDiv);
+            commentsContainer.scrollTop = commentsContainer.scrollHeight;
+        }
+
+        function loadCurrentSongComments() {
+            if (playlist[currentSongIndex]) {
+                fetch(`/api/songs/${playlist[currentSongIndex].id}/comments`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const commentsContainer = document.getElementById('songComments');
+                        commentsContainer.innerHTML = '';
+                        
+                        if (data.comments.length === 0) {
+                            commentsContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6);">Seja o primeiro a comentar!</p>';
+                        } else {
+                            data.comments.forEach(comment => addSongComment(comment));
+                        }
+                    });
+            }
+        }
+
+        function likeSongComment(commentId) {
+            if (currentUser) {
+                socket.emit('likeSongComment', {
+                    commentId,
+                    userId: currentUser.id
+                });
+            }
+        }
+
+        function updateCommentLikes(commentId, likes) {
+            const likesElement = document.getElementById(`likes-${commentId}`);
+            if (likesElement) {
+                likesElement.textContent = likes;
+            }
+        }
+
+        function shareToSocial(platform) {
+            if (!playlist[currentSongIndex]) return;
+
+            const song = playlist[currentSongIndex];
+            const text = `🎵 Escutando "${song.name}" na WebRadio! 🎶`;
+            const url = `${window.location.origin}/?song=${song.id}`;
+            
+            let shareUrl = '';
+            
+            switch(platform) {
+                case 'Twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+                    break;
+                case 'Facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                    break;
+                case 'WhatsApp':
+                    shareUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+                    break;
+                case 'Telegram':
+                    shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+                    break;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+                
+                // Registrar compartilhamento
+                if (currentUser) {
+                    fetch('/api/share/song', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            songId: song.id,
+                            userId: currentUser.id,
+                            platform
+                        })
+                    });
+                }
+            }
+        }
+
+        function copyShareUrl() {
+            if (!playlist[currentSongIndex]) return;
+
+            const song = playlist[currentSongIndex];
+            const url = `${window.location.origin}/?song=${song.id}`;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                showNotification('Copiado!', 'Link copiado para a área de transferência', 'info');
+                document.getElementById('shareUrl').value = url;
+            });
+        }
+
+        // Comment character counter
+        document.getElementById('commentInput').addEventListener('input', () => {
+            const charCount = document.getElementById('commentInput').value.length;
+            const charCounter = document.getElementById('commentCharCounter');
+            charCounter.textContent = `${charCount}/300`;
+            
+            if (charCount > 250) {
+                charCounter.style.color = '#e74c3c';
+            } else if (charCount > 200) {
+                charCounter.style.color = '#f39c12';
+            } else {
+                charCounter.style.color = 'rgba(255,255,255,0.7)';
+            }
+        });
+
+        // Tab Navigation (se quiser implementar)
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Esconder todos os containers
+            document.getElementById('userContainer').style.display = 'none';
+            document.getElementById('roomsContainer').style.display = 'none';
+            document.getElementById('friendsContainer').style.display = 'none';
+            document.getElementById('commentsContainer').style.display = 'none';
+            document.getElementById('socialContainer').style.display = 'none';
+            
+            // Mostrar container ativo
+            switch(tabName) {
+                case 'profile':
+                    document.getElementById('userContainer').style.display = 'block';
+                    break;
+                case 'rooms':
+                    document.getElementById('roomsContainer').style.display = 'block';
+                    break;
+                case 'friends':
+                    document.getElementById('friendsContainer').style.display = 'block';
+                    break;
+                case 'comments':
+                    document.getElementById('commentsContainer').style.display = 'block';
+                    loadCurrentSongComments();
+                    break;
+                case 'social':
+                    document.getElementById('socialContainer').style.display = 'block';
+                    break;
+            }
+        }
+
+        // Gamification Functions
+        function switchGamificationTab(tabName) {
+            currentGamificationTab = tabName;
+            
+            // Update tab buttons
+            document.querySelectorAll('#gamificationContainer .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`#gamificationContainer .tab-btn[onclick="switchGamificationTab('${tabName}')"]`).classList.add('active');
+            
+            // Show/hide content
+            document.querySelectorAll('#gamificationContainer .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            
+            // Load content
+            switch(tabName) {
+                case 'badges':
+                    loadBadges();
+                    break;
+                case 'leaderboard':
+                    loadLeaderboard();
+                    break;
+                case 'events':
+                    loadEvents();
+                    break;
+            }
+        }
+
+        function updatePointsDisplay() {
+            document.getElementById('totalPoints').textContent = userPoints.totalPoints || 0;
+            document.getElementById('dailyPoints').textContent = userPoints.dailyPoints || 0;
+            document.getElementById('weeklyPoints').textContent = userPoints.weeklyPoints || 0;
+            document.getElementById('consecutiveDays').textContent = userPoints.consecutiveDays || 0;
+            
+            // Update recent activities
+            if (userPoints.activities) {
+                const activitiesHtml = userPoints.activities.slice(-10).reverse().map(activity => `
+                    <div class="activity-item">
+                        <span class="activity-icon">${getActivityIcon(activity.type)}</span>
+                        <span class="activity-text">${getActivityDescription(activity.type)}</span>
+                        <span class="activity-points">+${activity.points}</span>
+                    </div>
+                `).join('');
+                
+                document.getElementById('recentActivities').innerHTML = activitiesHtml || 
+                    '<p style="text-align: center; color: rgba(255,255,255,0.6);">Nenhuma atividade recente</p>';
+            }
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                chat_message: '💬',
+                music_request: '🎵',
+                song_listen_complete: '🎧',
+                add_friend: '👥',
+                song_comment: '💭',
+                comment_like: '❤️',
+                daily_login: '📅',
+                room_visit: '🏠',
+                share_song: '📤',
+                event_participation: '🎉',
+                listening_time_hour: '⏰'
+            };
+            return icons[type] || '✨';
+        }
+
+        function getActivityDescription(type) {
+            const descriptions = {
+                chat_message: 'Mensagem enviada',
+                music_request: 'Pedido musical',
+                song_listen_complete: 'Música ouvida',
+                add_friend: 'Amigo adicionado',
+                song_comment: 'Comentário feito',
+                comment_like: 'Comentário curtido',
+                daily_login: 'Login diário',
+                room_visit: 'Sala visitada',
+                share_song: 'Música compartilhada',
+                event_participation: 'Evento participado',
+                listening_time_hour: 'Hora de escuta'
+            };
+            return descriptions[type] || type;
+        }
+
+        function updateUserRankDisplay(rank) {
+            const rankDisplay = document.getElementById('userRankDisplay');
+            if (rank && rank.alltime && rank.alltime.position) {
+                rankDisplay.textContent = `#${rank.alltime.position} posição`;
+            } else {
+                rankDisplay.textContent = '#-- posição';
+            }
+        }
+
+        function loadBadges() {
+            if (!currentUser) return;
+            
+            fetch(`/api/gamification/badges/${currentUser.id}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateBadgesDisplay(data.badges);
+                    
+                    const progress = (data.totalEarned / data.totalAvailable) * 100;
+                    document.getElementById('earnedBadgesCount').textContent = data.totalEarned;
+                    document.getElementById('totalBadgesCount').textContent = data.totalAvailable;
+                    document.getElementById('badgesProgressBar').style.width = progress + '%';
+                });
+        }
+
+        function updateBadgesDisplay(badges = null) {
+            if (!badges && currentUser) {
+                loadBadges();
+                return;
+            }
+            
+            if (!badges) return;
+            
+            const badgesList = document.getElementById('badgesList');
+            badgesList.innerHTML = badges.map(badge => `
+                <div class="badge-card ${badge.earned ? 'earned' : 'not-earned'}">
+                    <span class="badge-icon">${badge.name.split(' ')[0]}</span>
+                    <div class="badge-name">${badge.name.substring(2)}</div>
+                    <div class="badge-description">${badge.description}</div>
+                    <div class="badge-points">+${badge.points} pontos</div>
+                    ${!badge.earned ? `
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: ${badge.progress || 0}%"></div>
+                        </div>
+                        <small style="color: rgba(255,255,255,0.6);">${Math.round(badge.progress || 0)}% completo</small>
+                    ` : `
+                        <small style="color: #2ecc71;">✓ Conquistado</small>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function loadLeaderboard() {
+            fetch(`/api/gamification/leaderboard?period=${currentLeaderboardPeriod}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateLeaderboardDisplay(data.leaderboard);
+                });
+        }
+
+        function switchLeaderboard(period) {
+            currentLeaderboardPeriod = period;
+            
+            // Update tab buttons
+            document.querySelectorAll('#leaderboardTab .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`#leaderboardTab .tab-btn[onclick="switchLeaderboard('${period}')"]`).classList.add('active');
+            
+            loadLeaderboard();
+        }
+
+        function updateLeaderboardDisplay(leaderboardData) {
+            const leaderboardList = document.getElementById('leaderboardList');
+            
+            if (leaderboardData.length === 0) {
+                leaderboardList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6);">Nenhum dado disponível</p>';
+                return;
+            }
+            
+            leaderboardList.innerHTML = leaderboardData.map(entry => `
+                <div class="leaderboard-item ${entry.userId === currentUser?.id ? 'current-user' : ''}">
+                    <div class="leaderboard-position ${entry.position <= 3 ? 'top3' : ''}">${entry.position}</div>
+                    <img src="${entry.avatar || '/default-avatar.png'}" alt="Avatar" class="leaderboard-avatar">
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${entry.username}</div>
+                        <div class="leaderboard-points">${entry.points} pontos</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadEvents() {
+            fetch('/api/gamification/events')
+                .then(response => response.json())
+                .then(data => {
+                    activeEvents = data.activeEvents;
+                    updateEventsDisplay();
+                });
+        }
+
+        function updateEventsDisplay() {
+            const eventsList = document.getElementById('activeEventsList');
+            const noEventsMessage = document.getElementById('noEventsMessage');
+            
+            if (activeEvents.length === 0) {
+                eventsList.innerHTML = '';
+                noEventsMessage.style.display = 'block';
+                return;
+            }
+            
+            noEventsMessage.style.display = 'none';
+            eventsList.innerHTML = activeEvents.map(event => `
+                <div class="event-card">
+                    <div class="event-title">${event.name}</div>
+                    <div class="event-description">${event.description}</div>
+                    <div class="event-info">
+                        <span>Termina: ${new Date(event.endDate).toLocaleDateString()}</span>
+                        <span class="event-participants">${event.participantCount} participantes</span>
+                    </div>
+                    <button class="event-join-btn" onclick="joinEvent('${event.id}')" 
+                            ${event.participants.includes(currentUser?.id) ? 'disabled' : ''}>
+                        ${event.participants.includes(currentUser?.id) ? '✓ Participando' : '🎉 Participar'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function joinEvent(eventId) {
+            if (!currentUser) {
+                alert('Faça login para participar de eventos');
+                return;
+            }
+            
+            fetch(`/api/gamification/events/${eventId}/join`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUser.id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Sucesso!', data.message, 'info');
+                    updateEventsDisplay();
+                } else {
+                    alert(data.error);
+                }
+            });
+        }
+
+        function showPointsPopup(points, message) {
+            const popup = document.createElement('div');
+            popup.className = 'points-popup';
+            popup.innerHTML = `
+                <div style="font-weight: bold; font-size: 1.2em;">+${points} pontos!</div>
+                <div style="margin-top: 5px;">${message}</div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            setTimeout(() => popup.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+                setTimeout(() => {
+                    if (popup.parentNode) {
+                        popup.parentNode.removeChild(popup);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        function showBadgePopup(badge) {
+            const popup = document.createElement('div');
+            popup.className = 'badge-popup';
+            popup.innerHTML = `
+                <span class="badge-popup-icon">${badge.name.split(' ')[0]}</span>
+                <div class="badge-popup-title">Novo Badge!</div>
+                <div style="font-size: 1.1em; margin-bottom: 10px;">${badge.name.substring(2)}</div>
+                <div class="badge-popup-description">${badge.description}</div>
+                <div style="color: #f39c12; font-weight: bold;">+${badge.points} pontos</div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            setTimeout(() => popup.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+                setTimeout(() => {
+                    if (popup.parentNode) {
+                        popup.parentNode.removeChild(popup);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Override da função updateUserInterface para incluir gamificação
+        const originalUpdateUserInterface = updateUserInterface;
+        updateUserInterface = function() {
+            originalUpdateUserInterface();
+            if (isLoggedIn && currentUser) {
+                document.getElementById('gamificationContainer').style.display = 'block';
+                
+                // Carregar dados de gamificação
+                fetch(`/api/gamification/points/${currentUser.id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        userPoints = data.points;
+                        userBadges = data.badges;
+                        updatePointsDisplay();
+                        updateBadgesDisplay();
+                    });
+                
+                loadEvents();
+            }
+        };
+
+        // Tab switching for main interface
+        function switchMainTab(tabName) {
+            // Esconder todos os containers
+            document.getElementById('userContainer').style.display = 'none';
+            document.getElementById('roomsContainer').style.display = 'none';
+            document.getElementById('friendsContainer').style.display = 'none';
+            document.getElementById('commentsContainer').style.display = 'none';
+            document.getElementById('socialContainer').style.display = 'none';
+            document.getElementById('gamificationContainer').style.display = 'none';
+            
+            // Mostrar container ativo
+            switch(tabName) {
+                case 'profile':
+                    document.getElementById('userContainer').style.display = 'block';
+                    break;
+                case 'rooms':
+                    document.getElementById('roomsContainer').style.display = 'block';
+                    break;
+                case 'friends':
+                    document.getElementById('friendsContainer').style.display = 'block';
+                    break;
+                case 'comments':
+                    document.getElementById('commentsContainer').style.display = 'block';
+                    loadCurrentSongComments();
+                    break;
+                case 'social':
+                    document.getElementById('socialContainer').style.display = 'block';
+                    break;
+                case 'gamification':
+                    document.getElementById('gamificationContainer').style.display = 'block';
+                    loadEvents();
+                    break;
+            }
+        }
+
+        // Override da função loadCurrentSong para carregar comentários
+        const originalLoadCurrentSong = loadCurrentSong;
+        loadCurrentSong = function() {
+            originalLoadCurrentSong();
+            if (isLoggedIn) {
+                loadCurrentSongComments();
+            }
+        };
+
+        // Inicializar visualizador e animação
+        initVisualizer();
+        animate();
+    </script>
+</body>
+</html>
